@@ -6,10 +6,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.inject.Alternative;
+
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
-import org.commonjava.maven.galley.maven.parse.XMLInfrastructure;
 
 // TODO: Flesh out the implied artifacts!!
+@Alternative
 public class StandardMavenPluginImplications
     extends AbstractMavenPluginImplications
 {
@@ -35,11 +37,6 @@ public class StandardMavenPluginImplications
         implied.put( surefirePlugin, Collections.unmodifiableSet( surefire ) );
 
         IMPLIED_REFS = Collections.unmodifiableMap( implied );
-    }
-
-    public StandardMavenPluginImplications( final XMLInfrastructure xml )
-    {
-        super( xml );
     }
 
     @Override

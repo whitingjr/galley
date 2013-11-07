@@ -1,8 +1,9 @@
 package org.commonjava.maven.galley.maven.defaults;
 
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.A;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.G;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.V;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.A;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.G;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.V;
+import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.createElement;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -11,22 +12,15 @@ import java.util.Set;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
+import org.commonjava.maven.galley.maven.model.view.NodeRef;
 import org.commonjava.maven.galley.maven.model.view.PluginDependencyView;
 import org.commonjava.maven.galley.maven.model.view.PluginView;
-import org.commonjava.maven.galley.maven.parse.XMLInfrastructure;
-import org.w3c.dom.Element;
 
 public abstract class AbstractMavenPluginImplications
     implements MavenPluginImplications
 {
 
-    protected final XMLInfrastructure xml;
-
-    protected AbstractMavenPluginImplications( final XMLInfrastructure xml )
-    {
-        this.xml = xml;
-    }
-
+    // TODO: Streamline this by batching creation of multiple plugin deps.
     protected PluginDependencyView createPluginDependency( final PluginView pv, final ProjectRef ref )
     {
         final Map<String, String> map = new LinkedHashMap<>();
@@ -34,8 +28,9 @@ public abstract class AbstractMavenPluginImplications
         map.put( A, ref.getArtifactId() );
         map.put( V, pv.getVersion() );
 
-        final Element element = pv.getElement();
-        return new PluginDependencyView( pv.getPomView(), pv, xml.createElement( element, "dependencies/dependency", map ) );
+        final NodeRef element = pv.getElement();
+        final NodeRef nr = createElement( element, "dependencies/dependency", map );
+        return new PluginDependencyView( pv.getPomView(), pv, nr );
     }
 
     @Override
@@ -55,6 +50,9 @@ public abstract class AbstractMavenPluginImplications
         for ( final ProjectRef impliedRef : implied )
         {
             final PluginDependencyView pd = createPluginDependency( pv, impliedRef );
+            pv.getElement()
+              .updateNav( pd.getElement() );
+
             views.add( pd );
         }
 

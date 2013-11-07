@@ -1,5 +1,7 @@
 package org.commonjava.maven.galley.maven.parse;
 
+import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.parse;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,7 +16,6 @@ import org.commonjava.maven.galley.maven.ArtifactMetadataManager;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
 import org.commonjava.maven.galley.maven.model.view.DocRef;
 import org.commonjava.maven.galley.maven.model.view.MavenMetadataView;
-import org.commonjava.maven.galley.maven.model.view.XPathManager;
 import org.commonjava.maven.galley.model.Location;
 import org.commonjava.maven.galley.model.Transfer;
 import org.commonjava.util.logging.Logger;
@@ -29,18 +30,13 @@ public class MavenMetadataReader
     @Inject
     private ArtifactMetadataManager metadataManager;
 
-    @Inject
-    private XPathManager xpath;
-
     protected MavenMetadataReader()
     {
     }
 
-    public MavenMetadataReader( final XMLInfrastructure xml, final ArtifactMetadataManager metadataManager, final XPathManager xpath )
+    public MavenMetadataReader( final ArtifactMetadataManager metadataManager )
     {
-        super( xml );
         this.metadataManager = metadataManager;
-        this.xpath = xpath;
     }
 
     public MavenMetadataView getMetadata( final ProjectRef ref, final List<? extends Location> locations )
@@ -78,7 +74,7 @@ public class MavenMetadataReader
         {
             for ( final Transfer transfer : transfers )
             {
-                final DocRef<ProjectRef> dr = new DocRef<ProjectRef>( ref, transfer.getLocation(), xml.parse( transfer ) );
+                final DocRef<ProjectRef> dr = new DocRef<ProjectRef>( ref, transfer.getLocation(), parse( transfer ) );
                 final int idx = locations.indexOf( transfer.getLocation() );
                 docs.set( idx, dr );
             }
@@ -94,7 +90,7 @@ public class MavenMetadataReader
         }
 
         logger.info( "Got %d metadata documents for: %s", docs.size(), ref );
-        return new MavenMetadataView( docs, xpath, xml );
+        return new MavenMetadataView( docs );
     }
 
 }

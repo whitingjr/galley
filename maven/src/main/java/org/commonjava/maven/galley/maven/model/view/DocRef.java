@@ -5,12 +5,13 @@ import java.util.Map;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.galley.model.Location;
-import org.w3c.dom.Document;
+
+import com.ximpleware.VTDNav;
 
 public final class DocRef<T extends ProjectRef>
 {
 
-    private final Document doc;
+    private final VTDNav doc;
 
     private final T ref;
 
@@ -18,14 +19,14 @@ public final class DocRef<T extends ProjectRef>
 
     private final Map<String, Object> attributes = new HashMap<>();
 
-    public DocRef( final T ref, final Location location, final Document doc )
+    public DocRef( final T ref, final Location location, final VTDNav doc )
     {
         this.ref = ref;
         this.location = location;
         this.doc = doc;
     }
 
-    public Document getDoc()
+    public VTDNav getDoc()
     {
         return doc;
     }

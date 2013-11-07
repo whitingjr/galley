@@ -9,9 +9,7 @@ import org.commonjava.maven.galley.maven.defaults.StandardMaven304PluginDefaults
 import org.commonjava.maven.galley.maven.defaults.StandardMavenPluginImplications;
 import org.commonjava.maven.galley.maven.internal.ArtifactManagerImpl;
 import org.commonjava.maven.galley.maven.internal.ArtifactMetadataManagerImpl;
-import org.commonjava.maven.galley.maven.model.view.XPathManager;
 import org.commonjava.maven.galley.maven.parse.MavenPomReader;
-import org.commonjava.maven.galley.maven.parse.XMLInfrastructure;
 import org.commonjava.maven.galley.maven.type.StandardTypeMapper;
 import org.commonjava.maven.galley.maven.type.TypeMapper;
 import org.commonjava.maven.galley.spi.event.FileEventManager;
@@ -43,10 +41,6 @@ public class GalleyMavenFixture
 
     private MavenPluginImplications pluginImplications;
 
-    private XPathManager xpathManager;
-
-    private XMLInfrastructure xmlInfra;
-
     public GalleyMavenFixture( final ApiFixture api )
     {
         this.api = api;
@@ -76,24 +70,14 @@ public class GalleyMavenFixture
             pluginDefaults = new StandardMaven304PluginDefaults();
         }
 
-        if ( xmlInfra == null )
-        {
-            xmlInfra = new XMLInfrastructure();
-        }
-
         if ( pluginImplications == null )
         {
-            pluginImplications = new StandardMavenPluginImplications( xmlInfra );
-        }
-
-        if ( xpathManager == null )
-        {
-            xpathManager = new XPathManager();
+            pluginImplications = new StandardMavenPluginImplications();
         }
 
         if ( pomReader == null && artifacts != null )
         {
-            pomReader = new MavenPomReader( xmlInfra, artifacts, xpathManager, pluginDefaults, pluginImplications );
+            pomReader = new MavenPomReader( artifacts, pluginDefaults, pluginImplications );
         }
     }
 
@@ -164,16 +148,6 @@ public class GalleyMavenFixture
     public void setPluginDefaults( final StandardMaven304PluginDefaults pluginDefaults )
     {
         this.pluginDefaults = pluginDefaults;
-    }
-
-    public XPathManager getXpathManager()
-    {
-        return xpathManager;
-    }
-
-    public void setXpathManager( final XPathManager xpathManager )
-    {
-        this.xpathManager = xpathManager;
     }
 
     public TemporaryFolder getTemp()
@@ -264,16 +238,6 @@ public class GalleyMavenFixture
     public ApiFixture setTransfers( final TransferManager transfers )
     {
         return api.setTransfers( transfers );
-    }
-
-    public XMLInfrastructure getXmlInfra()
-    {
-        return xmlInfra;
-    }
-
-    public void setXmlInfra( final XMLInfrastructure xmlInfra )
-    {
-        this.xmlInfra = xmlInfra;
     }
 
     public ApiFixture getApi()

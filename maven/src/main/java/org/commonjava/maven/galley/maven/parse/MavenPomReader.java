@@ -1,5 +1,9 @@
 package org.commonjava.maven.galley.maven.parse;
 
+import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.getParentRef;
+import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.getProjectVersionRef;
+import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.parse;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,19 +22,16 @@ import org.commonjava.maven.galley.maven.model.view.DependencyView;
 import org.commonjava.maven.galley.maven.model.view.DocRef;
 import org.commonjava.maven.galley.maven.model.view.MavenPomView;
 import org.commonjava.maven.galley.maven.model.view.MavenXmlMixin;
-import org.commonjava.maven.galley.maven.model.view.XPathManager;
-import org.commonjava.maven.galley.maven.parse.peek.PomPeek;
 import org.commonjava.maven.galley.model.Location;
 import org.commonjava.maven.galley.model.Transfer;
 import org.commonjava.util.logging.Logger;
-import org.w3c.dom.Document;
+
+import com.ximpleware.VTDNav;
 
 @ApplicationScoped
 public class MavenPomReader
     extends AbstractMavenXmlReader<ProjectVersionRef>
 {
-
-    private static final String PEEK = "peek";
 
     private final Logger logger = new Logger( getClass() );
 
@@ -43,19 +44,14 @@ public class MavenPomReader
     @Inject
     private MavenPluginImplications pluginImplications;
 
-    @Inject
-    private XPathManager xpath;
-
     protected MavenPomReader()
     {
     }
 
-    public MavenPomReader( final XMLInfrastructure xml, final ArtifactManager artifactManager, final XPathManager xpath,
-                           final MavenPluginDefaults pluginDefaults, final MavenPluginImplications pluginImplications )
+    public MavenPomReader( final ArtifactManager artifactManager, final MavenPluginDefaults pluginDefaults,
+                           final MavenPluginImplications pluginImplications )
     {
-        super( xml );
         this.artifacts = artifactManager;
-        this.xpath = xpath;
         this.pluginDefaults = pluginDefaults;
         this.pluginImplications = pluginImplications;
     }
@@ -68,10 +64,9 @@ public class MavenPomReader
         DocRef<ProjectVersionRef> dr = getDocRef( pom, locations, false );
         stack.add( dr );
 
-        final ProjectVersionRef ref = dr.getAttribute( PEEK, PomPeek.class )
-                                        .getKey();
-        ProjectVersionRef next = dr.getAttribute( PEEK, PomPeek.class )
-                                   .getParentKey();
+        final ProjectVersionRef ref = getProjectVersionRef( dr.getDoc(), pom );
+        ProjectVersionRef next = getParentRef( dr.getDoc(), pom );
+
         while ( next != null && dr != null )
         {
             try
@@ -91,11 +86,10 @@ public class MavenPomReader
 
             stack.add( dr );
 
-            next = dr.getAttribute( PEEK, PomPeek.class )
-                     .getParentKey();
+            next = getParentRef( dr.getDoc(), dr.getRef() + "@" + dr.getLocation() );
         }
 
-        final MavenPomView view = new MavenPomView( ref, stack, xpath, pluginDefaults, pluginImplications, xml );
+        final MavenPomView view = new MavenPomView( ref, stack, pluginDefaults, pluginImplications );
         assembleImportedInformation( view, locations );
 
         logStructure( view );
@@ -166,10 +160,8 @@ public class MavenPomReader
                 return null;
             }
 
-            final Document doc = xml.parse( transfer );
+            final VTDNav doc = parse( transfer );
             dr = new DocRef<ProjectVersionRef>( ref, transfer.getLocation(), doc );
-            final PomPeek peek = new PomPeek( transfer, false, xml );
-            dr.setAttribute( PEEK, peek );
 
             if ( cache )
             {
@@ -183,20 +175,16 @@ public class MavenPomReader
     private DocRef<ProjectVersionRef> getDocRef( final Transfer pom, final List<? extends Location> locations, final boolean cache )
         throws GalleyMavenException
     {
-        PomPeek peek;
         final Transfer transfer = pom;
 
-        final Document doc = xml.parse( transfer );
-        peek = new PomPeek( transfer, true, xml );
-        final ProjectVersionRef ref = peek.getKey();
+        final VTDNav doc = parse( transfer );
+        final ProjectVersionRef ref = getProjectVersionRef( doc, pom );
         DocRef<ProjectVersionRef> dr = getFirstCached( ref, Arrays.asList( pom.getLocation() ) );
 
         if ( dr == null )
         {
             dr = new DocRef<ProjectVersionRef>( ref, transfer.getLocation(), doc );
         }
-
-        dr.setAttribute( PEEK, peek );
 
         if ( cache )
         {
@@ -217,7 +205,6 @@ public class MavenPomReader
     {
         final List<DocRef<ProjectVersionRef>> stack = new ArrayList<>();
 
-        PomPeek peek;
         ProjectVersionRef next = ref;
         do
         {
@@ -237,15 +224,13 @@ public class MavenPomReader
                 throw new GalleyMavenException( "Cannot resolve %s, %d levels dep in the ancestry stack of: %s", next, stack.size(), ref );
             }
 
-            peek = dr.getAttribute( PEEK, PomPeek.class );
-
             stack.add( dr );
 
-            next = peek.getParentKey();
+            next = getParentRef( dr.getDoc(), dr.getRef() + "@" + dr.getLocation() );
         }
         while ( next != null );
 
-        final MavenPomView view = new MavenPomView( ref, stack, xpath, pluginDefaults, pluginImplications, xml );
+        final MavenPomView view = new MavenPomView( ref, stack, pluginDefaults, pluginImplications );
         assembleImportedInformation( view, locations );
 
         logStructure( view );

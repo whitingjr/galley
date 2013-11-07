@@ -1,11 +1,10 @@
 package org.commonjava.maven.galley.maven.model.view;
 
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.A;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.G;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.A;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.G;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
-import org.w3c.dom.Element;
 
 public class MavenGAView
     extends MavenElementView
@@ -16,12 +15,12 @@ public class MavenGAView
 
     private String artifactId;
 
-    public MavenGAView( final MavenPomView pomView, final Element element, final String managementXpathFragment )
+    public MavenGAView( final MavenPomView pomView, final NodeRef element, final String managementXpathFragment )
     {
         super( pomView, element, managementXpathFragment );
     }
 
-    public MavenGAView( final MavenPomView pomView, final Element element )
+    public MavenGAView( final MavenPomView pomView, final NodeRef element )
     {
         super( pomView, element, null );
     }

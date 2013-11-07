@@ -4,15 +4,14 @@ import java.util.List;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
-import org.commonjava.maven.galley.maven.parse.XMLInfrastructure;
 
 public class MavenMetadataView
     extends MavenXmlView<ProjectRef>
 {
 
-    public MavenMetadataView( final List<DocRef<ProjectRef>> stack, final XPathManager xpath, final XMLInfrastructure xml )
+    public MavenMetadataView( final List<DocRef<ProjectRef>> stack )
     {
-        super( stack, xpath, xml );
+        super( stack );
     }
 
     public String resolveSingleValue( final String path )
@@ -24,7 +23,7 @@ public class MavenMetadataView
     public List<String> resolveValues( final String path )
         throws GalleyMavenException
     {
-        return resolveXPathExpressionToAggregatedList( path, true, -1 );
+        return resolveXPathExpressionToAggregatedList( path, -1 );
     }
 
 }

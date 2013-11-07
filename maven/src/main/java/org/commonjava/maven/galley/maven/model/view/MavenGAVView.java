@@ -1,10 +1,9 @@
 package org.commonjava.maven.galley.maven.model.view;
 
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.V;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.V;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
-import org.w3c.dom.Element;
 
 public class MavenGAVView
     extends MavenGAView
@@ -13,12 +12,12 @@ public class MavenGAVView
 
     private String version;
 
-    public MavenGAVView( final MavenPomView pomView, final Element element, final String managementXpathFragment )
+    public MavenGAVView( final MavenPomView pomView, final NodeRef element, final String managementXpathFragment )
     {
         super( pomView, element, managementXpathFragment );
     }
 
-    public MavenGAVView( final MavenPomView pomView, final Element element )
+    public MavenGAVView( final MavenPomView pomView, final NodeRef element )
     {
         super( pomView, element );
     }

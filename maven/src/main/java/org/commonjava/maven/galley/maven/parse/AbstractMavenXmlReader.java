@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.inject.Inject;
-
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.galley.maven.model.view.DocRef;
 import org.commonjava.maven.galley.model.Location;
@@ -16,18 +14,6 @@ public abstract class AbstractMavenXmlReader<T extends ProjectRef>
 {
 
     private final Map<DocCacheKey<T>, WeakReference<DocRef<T>>> cache = new ConcurrentHashMap<>();
-
-    @Inject
-    protected XMLInfrastructure xml;
-
-    protected AbstractMavenXmlReader()
-    {
-    }
-
-    protected AbstractMavenXmlReader( final XMLInfrastructure xml )
-    {
-        this.xml = xml;
-    }
 
     protected synchronized void cache( final DocRef<T> dr )
     {

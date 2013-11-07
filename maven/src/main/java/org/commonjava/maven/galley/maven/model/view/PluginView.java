@@ -1,10 +1,10 @@
 package org.commonjava.maven.galley.maven.model.view;
 
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.A;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.AND;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.G;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.QUOTE;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.TEXTEQ;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.A;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.AND;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.G;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.QUOTE;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.TEXTEQ;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,6 @@ import java.util.Set;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
 import org.commonjava.maven.galley.maven.defaults.MavenPluginDefaults;
 import org.commonjava.maven.galley.maven.defaults.MavenPluginImplications;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class PluginView
     extends MavenGAVView
@@ -26,7 +24,7 @@ public class PluginView
 
     private final MavenPluginImplications pluginImplications;
 
-    protected PluginView( final MavenPomView pomView, final Element element, final MavenPluginDefaults pluginDefaults,
+    protected PluginView( final MavenPomView pomView, final NodeRef element, final MavenPluginDefaults pluginDefaults,
                           final MavenPluginImplications pluginImplications )
     {
         super( pomView, element, "build/pluginManagement/plugins/plugin" );
@@ -37,7 +35,7 @@ public class PluginView
     public boolean isManaged()
         throws GalleyMavenException
     {
-        return pomView.resolveXPathToNodeFrom( element, "ancestor::pluginManagement", true ) != null;
+        return pomView.resolveXPathToNodeFrom( element, "ancestor::pluginManagement" ) != null;
     }
 
     public synchronized List<PluginDependencyView> getLocalPluginDependencies()
@@ -47,12 +45,12 @@ public class PluginView
         {
             final List<PluginDependencyView> result = new ArrayList<>();
 
-            final List<Node> nodes = getFirstNodesWithManagement( "dependencies/dependency" );
+            final List<NodeRef> nodes = getFirstNodesWithManagement( "dependencies/dependency" );
             if ( nodes != null )
             {
-                for ( final Node node : nodes )
+                for ( final NodeRef node : nodes )
                 {
-                    result.add( new PluginDependencyView( pomView, this, (Element) node ) );
+                    result.add( new PluginDependencyView( pomView, this, node ) );
                 }
 
                 this.pluginDependencies = result;

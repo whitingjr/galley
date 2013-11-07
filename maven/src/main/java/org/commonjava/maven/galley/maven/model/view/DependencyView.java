@@ -1,14 +1,14 @@
 package org.commonjava.maven.galley.maven.model.view;
 
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.A;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.AND;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.END_PAREN;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.G;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.NOT;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.OPEN_PAREN;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.OR;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.QUOTE;
-import static org.commonjava.maven.galley.maven.model.view.XPathManager.TEXTEQ;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.A;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.AND;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.END_PAREN;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.G;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.NOT;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.OPEN_PAREN;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.OR;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.QUOTE;
+import static org.commonjava.maven.galley.maven.model.view.XPathConstants.TEXTEQ;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,8 +19,6 @@ import org.commonjava.maven.atlas.ident.ref.ArtifactRef;
 import org.commonjava.maven.atlas.ident.ref.VersionlessArtifactRef;
 import org.commonjava.maven.atlas.ident.version.InvalidVersionSpecificationException;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class DependencyView
     extends MavenGAVView
@@ -46,7 +44,7 @@ public class DependencyView
 
     private Set<ProjectRefView> exclusions;
 
-    public DependencyView( final MavenPomView pomView, final Element element )
+    public DependencyView( final MavenPomView pomView, final NodeRef element )
     {
         super( pomView, element, "dependencyManagement/dependencies/dependency" );
     }
@@ -54,7 +52,7 @@ public class DependencyView
     public boolean isManaged()
         throws GalleyMavenException
     {
-        return pomView.resolveXPathToNodeFrom( element, "ancestor::dependencyManagement", true ) != null;
+        return pomView.resolveXPathToNodeFrom( element, "ancestor::dependencyManagement" ) != null;
     }
 
     public synchronized String getClassifier()
@@ -109,13 +107,13 @@ public class DependencyView
     {
         if ( exclusions == null )
         {
-            final List<Node> nodes = getFirstNodesWithManagement( EXCLUSIONS );
+            final List<NodeRef> nodes = getFirstNodesWithManagement( EXCLUSIONS );
             if ( nodes != null )
             {
                 final Set<ProjectRefView> exclusions = new HashSet<>();
-                for ( final Node node : nodes )
+                for ( final NodeRef node : nodes )
                 {
-                    exclusions.add( new MavenGAView( pomView, (Element) node ) );
+                    exclusions.add( new MavenGAView( pomView, node ) );
                 }
 
                 this.exclusions = exclusions;

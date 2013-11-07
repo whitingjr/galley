@@ -1,13 +1,12 @@
 package org.commonjava.maven.galley.maven.model.view;
 
 import org.commonjava.maven.galley.maven.GalleyMavenException;
-import org.w3c.dom.Element;
 
 public class ParentView
     extends MavenGAVView
 {
 
-    public ParentView( final MavenPomView pomView, final Element element )
+    public ParentView( final MavenPomView pomView, final NodeRef element )
     {
         super( pomView, element );
     }
