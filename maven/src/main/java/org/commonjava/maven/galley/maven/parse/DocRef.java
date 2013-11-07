@@ -1,4 +1,4 @@
-package org.commonjava.maven.galley.maven.model.view;
+package org.commonjava.maven.galley.maven.parse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +18,8 @@ public final class DocRef<T extends ProjectRef>
     private final Location location;
 
     private final Map<String, Object> attributes = new HashMap<>();
+
+    private DocCacheKey<T> key;
 
     public DocRef( final T ref, final Location location, final VTDNav doc )
     {
@@ -56,6 +58,16 @@ public final class DocRef<T extends ProjectRef>
     public String toString()
     {
         return String.format( "DocRef [%s] (from: %s)", ref, location );
+    }
+
+    public synchronized DocCacheKey<T> getCacheKey()
+    {
+        if ( key == null )
+        {
+            key = new DocCacheKey<T>( ref, location );
+        }
+
+        return key;
     }
 
 }

@@ -1,5 +1,6 @@
 package org.commonjava.maven.galley.maven.model.view;
 
+import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.getProjectVersionRef;
 import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.parse;
 import static org.commonjava.maven.galley.maven.parse.XMLInfrastructure.toXML;
 
@@ -13,6 +14,7 @@ import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.commonjava.maven.galley.maven.defaults.StandardMaven304PluginDefaults;
 import org.commonjava.maven.galley.maven.defaults.StandardMavenPluginImplications;
+import org.commonjava.maven.galley.maven.parse.DocRef;
 import org.commonjava.maven.galley.model.SimpleLocation;
 import org.commonjava.util.logging.Log4jUtil;
 import org.commonjava.util.logging.Logger;
@@ -53,16 +55,23 @@ public abstract class AbstractMavenViewTest
         throws Exception
     {
         final List<DocRef<ProjectVersionRef>> stack = new ArrayList<>();
-        final ProjectVersionRef pvr = new ProjectVersionRef( "not.used", "project-ref", "1.0" );
+        ProjectVersionRef pvr = null;
         for ( final String pomName : pomNames )
         {
             final InputStream is = Thread.currentThread()
                                          .getContextClassLoader()
                                          .getResourceAsStream( getBaseResource() + pomName );
 
-            final VTDNav document = parse( getBaseResource() + pomName, is );
+            final String pomLoc = getBaseResource() + pomName;
+            final VTDNav document = parse( pomLoc, is );
 
-            final DocRef<ProjectVersionRef> dr = new DocRef<ProjectVersionRef>( pvr, new SimpleLocation( "http://localhost:8080/" ), document );
+            final DocRef<ProjectVersionRef> dr =
+                new DocRef<ProjectVersionRef>( getProjectVersionRef( document, pomLoc ), new SimpleLocation( "http://localhost:8080/" ), document );
+
+            if ( pvr == null )
+            {
+                pvr = dr.getRef();
+            }
 
             stack.add( dr );
         }

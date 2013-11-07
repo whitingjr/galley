@@ -12,6 +12,7 @@ import org.codehaus.plexus.interpolation.ValueSource;
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
 import org.commonjava.maven.galley.maven.GalleyMavenRuntimeException;
+import org.commonjava.maven.galley.maven.parse.DocRef;
 import org.commonjava.maven.galley.maven.parse.XMLInfrastructure;
 import org.commonjava.util.logging.Logger;
 

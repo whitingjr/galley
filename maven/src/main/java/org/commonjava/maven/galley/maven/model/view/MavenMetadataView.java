@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.commonjava.maven.atlas.ident.ref.ProjectRef;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
+import org.commonjava.maven.galley.maven.parse.DocRef;
 
 public class MavenMetadataView
     extends MavenXmlView<ProjectRef>

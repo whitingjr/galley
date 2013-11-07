@@ -9,6 +9,7 @@ import org.commonjava.maven.atlas.ident.ref.ProjectVersionRef;
 import org.commonjava.maven.galley.maven.GalleyMavenException;
 import org.commonjava.maven.galley.maven.defaults.MavenPluginDefaults;
 import org.commonjava.maven.galley.maven.defaults.MavenPluginImplications;
+import org.commonjava.maven.galley.maven.parse.DocRef;
 
 public class MavenPomView
     extends MavenXmlView<ProjectVersionRef>
