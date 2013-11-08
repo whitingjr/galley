@@ -13,17 +13,8 @@ public class NodeRef
 
     public NodeRef( final VTDNav nav, final int idx )
     {
-        this.nav = nav.cloneNav();
+        this.nav = nav;
         this.idx = idx;
-
-        try
-        {
-            this.nav.recoverNode( idx );
-        }
-        catch ( final NavException e )
-        {
-            throw new GalleyMavenRuntimeException( "Failed to seek to node index: %d on cloned nav. Reason: %s", e, idx, e.getMessage() );
-        }
     }
 
     public VTDNav getNav()

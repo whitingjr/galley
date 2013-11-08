@@ -3,7 +3,6 @@ package org.commonjava.maven.galley.maven.model.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.commonjava.maven.galley.maven.GalleyMavenException;
 import org.commonjava.maven.galley.maven.GalleyMavenRuntimeException;
 
 import com.ximpleware.AutoPilot;
@@ -18,6 +17,8 @@ public class MavenElementView
     //    private final Logger logger = new Logger( getClass() );
 
     protected final NodeRef element;
+
+    protected NodeRef managementElement;
 
     protected final MavenPomView pomView;
 
@@ -57,6 +58,26 @@ public class MavenElementView
         return element;
     }
 
+    public synchronized NodeRef getManagementElement()
+    {
+        if ( managementElement == null )
+        {
+            initManagementXpaths();
+
+            for ( final String xpath : managementXpaths )
+            {
+                final NodeRef node = pomView.resolveXPathToNode( xpath, -1 );
+                if ( node != null )
+                {
+                    managementElement = node;
+                    break;
+                }
+            }
+        }
+
+        return managementElement;
+    }
+
     public MavenPomView getPomView()
     {
         return pomView;
@@ -73,43 +94,35 @@ public class MavenElementView
         //        logger.info( "Value of path: '%s' local to: %s is: '%s'\nIn: %s", named, element, value, pomView.getRef() );
         if ( value == null )
         {
-            final String[] managementXpaths = managementXpathsFor( named + "/text()" );
-            for ( final String managementXpath : managementXpaths )
+            final NodeRef managementElement = getManagementElement();
+            if ( managementElement != null )
             {
-                if ( managementXpath != null )
-                {
-                    value = pomView.resolveXPathExpression( managementXpath, false, -1 );
-                    //                    logger.info( "Value of management xpath: '%s' in %s is '%s'\nIn: %s", named, element, value, pomView.getRef() );
-                    if ( value != null )
-                    {
-                        break;
-                    }
-                }
+                value = getValueFrom( managementElement, named );
             }
         }
 
         return value;
     }
 
-    protected List<NodeRef> getAggregateNodesWithManagement( final String path )
-        throws GalleyMavenException
-    {
-        List<NodeRef> nodes = pomView.resolveXPathToNodeListFrom( this.element, path );
-        if ( nodes == null || nodes.isEmpty() )
-        {
-            final String[] xpaths = managementXpathsFor( path );
-            for ( final String xpath : xpaths )
-            {
-                nodes = pomView.resolveXPathToAggregatedNodeList( xpath, -1 );
-                if ( nodes != null && !nodes.isEmpty() )
-                {
-                    break;
-                }
-            }
-        }
-
-        return nodes;
-    }
+    //    protected List<NodeRef> getAggregateNodesWithManagement( final String path )
+    //        throws GalleyMavenException
+    //    {
+    //        List<NodeRef> nodes = pomView.resolveXPathToNodeListFrom( this.element, path );
+    //        if ( nodes == null || nodes.isEmpty() )
+    //        {
+    //            final String[] xpaths = managementXpathsFor( path );
+    //            for ( final String xpath : xpaths )
+    //            {
+    //                nodes = pomView.resolveXPathToAggregatedNodeList( xpath, -1 );
+    //                if ( nodes != null && !nodes.isEmpty() )
+    //                {
+    //                    break;
+    //                }
+    //            }
+    //        }
+    //
+    //        return nodes;
+    //    }
 
     protected List<NodeRef> getFirstNodesWithManagement( final String path )
     {
@@ -117,37 +130,14 @@ public class MavenElementView
         List<NodeRef> nodes = pomView.resolveXPathToNodeListFrom( this.element, path );
         if ( nodes == null || nodes.isEmpty() )
         {
-            final String[] xpaths = managementXpathsFor( path );
-            for ( final String xpath : xpaths )
+            final NodeRef me = getManagementElement();
+            if ( me != null )
             {
-                //                logger.info( "Resolving '%s' from POM hierarchy.", xpath );
-                nodes = pomView.resolveXPathToFirstNodeList( xpath, -1 );
-                if ( nodes != null && !nodes.isEmpty() )
-                {
-                    break;
-                }
+                nodes = pomView.resolveXPathToNodeListFrom( me, path );
             }
         }
 
         return nodes;
-    }
-
-    private String[] managementXpathsFor( final String named )
-    {
-        initManagementXpaths();
-        if ( managementXpaths == null )
-        {
-            return null;
-        }
-
-        final String[] result = new String[managementXpaths.length];
-        for ( int i = 0; i < result.length; i++ )
-        {
-            //            logger.info( "Customizing management XPath: '%s' for: '%s'", managementXpaths[i], named );
-            result[i] = String.format( managementXpaths[i], named );
-        }
-
-        return result;
     }
 
     private void initManagementXpaths()
@@ -176,7 +166,7 @@ public class MavenElementView
               .append( managementXpathFragment )
               .append( '[' )
               .append( qualifier )
-              .append( "]/%s" );
+              .append( "]" );
 
             final String xp = sb.toString();
             xpaths.add( xp );
@@ -188,7 +178,7 @@ public class MavenElementView
           .append( managementXpathFragment )
           .append( '[' )
           .append( qualifier )
-          .append( "]/%s" );
+          .append( "]" );
 
         final String xp = sb.toString();
         xpaths.add( xp );
@@ -199,7 +189,12 @@ public class MavenElementView
 
     protected String getValue( final String path )
     {
-        return pomView.resolveExpressions( pomView.resolveXPathToNodeFrom( element, path ) );
+        return getValueFrom( element, path );
+    }
+
+    protected String getValueFrom( final NodeRef from, final String path )
+    {
+        return pomView.resolveExpressions( pomView.resolveXPathToNodeFrom( from, path ) );
     }
 
     protected NodeRef getNode( final String path )

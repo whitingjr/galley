@@ -49,6 +49,14 @@ public final class XMLInfrastructure
     {
         VTDNav nav = below.getNav()
                           .cloneNav();
+        try
+        {
+            nav.recoverNode( below.getIdx() );
+        }
+        catch ( final NavException e )
+        {
+            throw new GalleyMavenRuntimeException( "Failed to recover to node index: %d. Reason: %s", e, below.getIdx(), e.getMessage() );
+        }
 
         final StringBuilder sb = new StringBuilder();
         int indent = nav.getCurrentDepth();

@@ -27,6 +27,8 @@ public class MavenXmlView<T extends ProjectRef>
 
     private static final String EXPRESSION_PATTERN = ".*\\$\\{.+\\}.*";
 
+    private static final String AUTOPILOT = "autopilot";
+
     private final Logger logger = new Logger( getClass() );
 
     private final List<DocRef<T>> stack;
@@ -154,8 +156,10 @@ public class MavenXmlView<T extends ProjectRef>
                     break;
                 }
 
-                final VTDNav doc = dr.getDoc();
-                final AutoPilot ap = new AutoPilot( doc );
+                final VTDNav doc = dr.getDoc()
+                                     .cloneNav();
+                final AutoPilot ap = getAutoPilot( doc );
+
                 ap.selectXPath( path );
                 final int idx = ap.evalXPath();
                 if ( idx > -1 )
@@ -201,6 +205,25 @@ public class MavenXmlView<T extends ProjectRef>
         return result;
     }
 
+    public AutoPilot getAutoPilot( final VTDNav doc )
+    {
+        final DocRef<T> dr = getDocRefStack().get( 0 );
+
+        AutoPilot ap;
+        synchronized ( dr )
+        {
+            ap = dr.getAttribute( AUTOPILOT, AutoPilot.class );
+            if ( ap == null )
+            {
+                ap = new AutoPilot();
+                dr.setAttribute( AUTOPILOT, ap );
+            }
+        }
+
+        ap.bind( doc );
+        return ap;
+    }
+
     public synchronized List<NodeRef> resolveXPathToAggregatedNodeList( final String path, final int maxDepth )
         throws GalleyMavenRuntimeException
     {
@@ -225,7 +248,7 @@ public class MavenXmlView<T extends ProjectRef>
                     break;
                 }
 
-                final List<NodeRef> nodes = getLocalNodeList( path, dr.getDoc() );
+                final List<NodeRef> nodes = getLocalNodeList( path, dr );
                 if ( nodes != null )
                 {
                     for ( final NodeRef node : nodes )
@@ -289,7 +312,7 @@ public class MavenXmlView<T extends ProjectRef>
                     break;
                 }
 
-                final List<NodeRef> result = getLocalNodeList( path, dr.getDoc() );
+                final List<NodeRef> result = getLocalNodeList( path, dr );
                 if ( result != null )
                 {
                     return result;
@@ -324,12 +347,14 @@ public class MavenXmlView<T extends ProjectRef>
         }
     }
 
-    private List<NodeRef> getLocalNodeList( final String path, final VTDNav doc )
+    private List<NodeRef> getLocalNodeList( final String path, final DocRef<T> dr )
         throws GalleyMavenRuntimeException
     {
         final List<NodeRef> result = new ArrayList<>();
 
-        final AutoPilot ap = new AutoPilot( doc );
+        final VTDNav doc = dr.getDoc()
+                             .cloneNav();
+        final AutoPilot ap = getAutoPilot( doc );
         try
         {
             ap.selectXPath( path );
@@ -416,7 +441,10 @@ public class MavenXmlView<T extends ProjectRef>
         {
             final VTDNav nav = root.getNav()
                                    .cloneNav();
-            final AutoPilot ap = new AutoPilot( nav );
+            nav.recoverNode( root.getIdx() );
+
+            final AutoPilot ap = getAutoPilot( nav );
+
             ap.selectXPath( path );
             final int idx = ap.evalXPath();
             if ( idx > -1 )
@@ -444,7 +472,9 @@ public class MavenXmlView<T extends ProjectRef>
             final List<NodeRef> result = new ArrayList<>();
             final VTDNav nav = root.getNav()
                                    .cloneNav();
-            final AutoPilot ap = new AutoPilot( nav );
+            nav.recoverNode( root.getIdx() );
+
+            final AutoPilot ap = getAutoPilot( nav );
             ap.selectXPath( path );
             int idx = -1;
             while ( ( idx = ap.evalXPath() ) > -1 )
