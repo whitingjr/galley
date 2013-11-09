@@ -158,7 +158,13 @@ public class MavenXmlView<T extends ProjectRef>
 
                 final VTDNav doc = dr.getDoc()
                                      .cloneNav();
+
                 final AutoPilot ap = getAutoPilot( doc );
+
+                //                if ( path.startsWith( "/" ) )
+                //                {
+                //                    doc.toElement( VTDNav.ROOT );
+                //                }
 
                 ap.selectXPath( path );
                 final int idx = ap.evalXPath();
@@ -354,23 +360,26 @@ public class MavenXmlView<T extends ProjectRef>
 
         final VTDNav doc = dr.getDoc()
                              .cloneNav();
-        final AutoPilot ap = getAutoPilot( doc );
-        try
-        {
-            ap.selectXPath( path );
-        }
-        catch ( final XPathParseException e )
-        {
-            throw new GalleyMavenRuntimeException( "Failed to parse xpath expression: %s. Reason: %s", e, path, e.getMessage() );
-        }
 
-        int idx = -1;
         try
         {
+            //            if ( path.startsWith( "/" ) )
+            //            {
+            //                doc.toElement( VTDNav.ROOT );
+            //            }
+
+            final AutoPilot ap = getAutoPilot( doc );
+            ap.selectXPath( path );
+
+            int idx = -1;
             while ( ( idx = ap.evalXPath() ) > -1 )
             {
                 result.add( new NodeRef( doc, idx ) );
             }
+        }
+        catch ( final XPathParseException e )
+        {
+            throw new GalleyMavenRuntimeException( "Failed to parse xpath expression: %s. Reason: %s", e, path, e.getMessage() );
         }
         catch ( XPathEvalException | NavException e )
         {

@@ -82,8 +82,7 @@ public class MavenPomView
         throws GalleyMavenException
     {
         final List<NodeRef> depNodes =
-            resolveXPathToAggregatedNodeList( "//dependency[not(ancestor::dependencyManagement) and not(ancestor::build) and not(ancestor::reporting)]",
-                                              -1 );
+            resolveXPathToAggregatedNodeList( "/project/dependencies/dependency|/project/profiles/profile/dependencies/dependency", -1 );
         final List<DependencyView> depViews = new ArrayList<>( depNodes.size() );
         for ( final NodeRef node : depNodes )
         {
@@ -96,7 +95,9 @@ public class MavenPomView
     public List<DependencyView> getAllManagedDependencies()
         throws GalleyMavenException
     {
-        final List<NodeRef> depNodes = resolveXPathToAggregatedNodeList( "//dependencyManagement/dependencies/dependency", -1 );
+        final List<NodeRef> depNodes =
+            resolveXPathToAggregatedNodeList( "/project/dependencyManagement/dependencies/dependency|"
+                + "/project/profiles/profile/dependencyManagement/dependencies/dependency", -1 );
         final List<DependencyView> depViews = new ArrayList<>( depNodes.size() );
         for ( final NodeRef node : depNodes )
         {
@@ -110,7 +111,9 @@ public class MavenPomView
         throws GalleyMavenException
     {
         final List<NodeRef> depNodes =
-            resolveXPathToAggregatedNodeList( "//dependencyManagement/dependencies/dependency[type/text()=\"pom\" and scope/text()=\"import\"]", -1 );
+            resolveXPathToAggregatedNodeList( "/project/dependencyManagement/dependencies/dependency[type/text()=\"pom\" and scope/text()=\"import\"]|"
+                                                  + "/project/profiles/profile/dependencyManagement/dependencies/dependency[type/text()=\"pom\" and scope/text()=\"import\"]",
+                                              -1 );
 
         final List<DependencyView> depViews = new ArrayList<>( depNodes.size() );
         for ( final NodeRef node : depNodes )
@@ -176,7 +179,8 @@ public class MavenPomView
     public List<ExtensionView> getBuildExtensions()
         throws GalleyMavenException
     {
-        final List<NodeRef> list = resolveXPathToAggregatedNodeList( "/project//extension", -1 );
+        final List<NodeRef> list =
+            resolveXPathToAggregatedNodeList( "/project/build/extensions/extension|" + "/project/profiles/profile/build/extensions/extension", -1 );
         final List<ExtensionView> result = new ArrayList<>( list.size() );
         for ( final NodeRef node : list )
         {
@@ -230,7 +234,8 @@ public class MavenPomView
     public List<PluginView> getAllBuildPlugins()
         throws GalleyMavenException
     {
-        final List<NodeRef> list = resolveXPathToAggregatedNodeList( "/project//build/plugins/plugin", -1 );
+        final List<NodeRef> list =
+            resolveXPathToAggregatedNodeList( "/project/build/plugins/plugin|" + "/project/profiles/profile/build/plugins/plugin", -1 );
         final List<PluginView> result = new ArrayList<>( list.size() );
         for ( final NodeRef node : list )
         {
@@ -248,7 +253,9 @@ public class MavenPomView
     public List<PluginView> getAllManagedBuildPlugins()
         throws GalleyMavenException
     {
-        final List<NodeRef> list = resolveXPathToAggregatedNodeList( "/project//pluginManagement/plugins/plugin", -1 );
+        final List<NodeRef> list =
+            resolveXPathToAggregatedNodeList( "/project/build/pluginManagement/plugins/plugin|"
+                + "/project/profiles/profile/build/pluginManagement/plugins/plugin", -1 );
         final List<PluginView> result = new ArrayList<>( list.size() );
         for ( final NodeRef node : list )
         {
@@ -266,7 +273,7 @@ public class MavenPomView
     public List<ProjectVersionRefView> getProjectVersionRefs( final String path )
         throws GalleyMavenException
     {
-        final List<NodeRef> list = resolveXPathToAggregatedNodeList( "/project//pluginManagement/plugins/plugin", -1 );
+        final List<NodeRef> list = resolveXPathToAggregatedNodeList( path, -1 );
         final List<ProjectVersionRefView> result = new ArrayList<>( list.size() );
         for ( final NodeRef node : list )
         {
@@ -284,7 +291,7 @@ public class MavenPomView
     public List<ProjectRefView> getProjectRefs( final String path )
         throws GalleyMavenException
     {
-        final List<NodeRef> list = resolveXPathToAggregatedNodeList( "/project//pluginManagement/plugins/plugin", -1 );
+        final List<NodeRef> list = resolveXPathToAggregatedNodeList( path, -1 );
         final List<ProjectRefView> result = new ArrayList<>( list.size() );
         for ( final NodeRef node : list )
         {

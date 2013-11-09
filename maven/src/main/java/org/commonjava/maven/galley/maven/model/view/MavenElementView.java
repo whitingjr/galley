@@ -66,6 +66,7 @@ public class MavenElementView
 
             for ( final String xpath : managementXpaths )
             {
+                //                logger.info( "Attempting to retrieve management element from: '%s'", xpath );
                 final NodeRef node = pomView.resolveXPathToNode( xpath, -1 );
                 if ( node != null )
                 {
@@ -194,7 +195,36 @@ public class MavenElementView
 
     protected String getValueFrom( final NodeRef from, final String path )
     {
-        return pomView.resolveExpressions( pomView.resolveXPathToNodeFrom( from, path ) );
+        final String[] parts = path.split( "/" );
+        final VTDNav nav = from.getNav()
+                               .cloneNav();
+
+        try
+        {
+            nav.recoverNode( from.getIdx() );
+
+            //            logger.info( "START: %s", nav.toString( nav.getCurrentIndex() ) );
+            for ( final String part : parts )
+            {
+                if ( nav.toElement( VTDNav.FIRST_CHILD, part ) )
+                {
+                    //                    logger.info( "AT: %s", nav.toString( nav.getCurrentIndex() ) );
+                }
+                else
+                {
+                    //                    logger.info( "MISS: %s", part );
+                    return null;
+                }
+            }
+
+            //            logger.info( "Getting text for: %s", nav.toString( nav.getCurrentIndex() ) );
+        }
+        catch ( final NavException e )
+        {
+            throw new GalleyMavenRuntimeException( "Failed to navigate to: %s. Reason: %s", e, path, e.getMessage() );
+        }
+
+        return pomView.resolveExpressions( new NodeRef( nav, nav.getCurrentIndex() ) );
     }
 
     protected NodeRef getNode( final String path )

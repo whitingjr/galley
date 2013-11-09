@@ -24,6 +24,90 @@ public class MavenPomViewTest
     }
 
     @Test
+    public void dependencyLikeStructuresInDirectPluginConfig()
+        throws Exception
+    {
+        final String depArtifactItemsPath =
+            "/project/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem|"
+                + "/project/profiles/profile/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem";
+
+        final MavenPomView pomView = loadPoms( "pom-with-plugin-deplike.xml" );
+
+        final List<DependencyView> dvs = pomView.getAllDependenciesMatching( depArtifactItemsPath );
+        assertThat( dvs, notNullValue() );
+        assertThat( dvs.size(), equalTo( 1 ) );
+
+        final DependencyView dv = dvs.get( 0 );
+
+        assertThat( dv.getGroupId(), equalTo( "org.foo" ) );
+        assertThat( dv.getArtifactId(), equalTo( "bar" ) );
+        assertThat( dv.getVersion(), equalTo( "1" ) );
+    }
+
+    @Test
+    public void dependencyLikeStructuresInProfileDirectPluginConfig()
+        throws Exception
+    {
+        final String depArtifactItemsPath =
+            "/project/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem|"
+                + "/project/profiles/profile/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem";
+
+        final MavenPomView pomView = loadPoms( "pom-with-profile-plugin-deplike.xml" );
+
+        final List<DependencyView> dvs = pomView.getAllDependenciesMatching( depArtifactItemsPath );
+        assertThat( dvs, notNullValue() );
+        assertThat( dvs.size(), equalTo( 1 ) );
+
+        final DependencyView dv = dvs.get( 0 );
+
+        assertThat( dv.getGroupId(), equalTo( "org.foo" ) );
+        assertThat( dv.getArtifactId(), equalTo( "bar" ) );
+        assertThat( dv.getVersion(), equalTo( "1" ) );
+    }
+
+    @Test
+    public void dependencyLikeStructuresInManagedPluginConfig()
+        throws Exception
+    {
+        final String depArtifactItemsPath =
+            "/project/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem|"
+                + "/project/profiles/profile/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem";
+
+        final MavenPomView pomView = loadPoms( "pom-with-pluginMgmt-deplike.xml" );
+
+        final List<DependencyView> dvs = pomView.getAllDependenciesMatching( depArtifactItemsPath );
+        assertThat( dvs, notNullValue() );
+        assertThat( dvs.size(), equalTo( 1 ) );
+
+        final DependencyView dv = dvs.get( 0 );
+
+        assertThat( dv.getGroupId(), equalTo( "org.foo" ) );
+        assertThat( dv.getArtifactId(), equalTo( "bar" ) );
+        assertThat( dv.getVersion(), equalTo( "1" ) );
+    }
+
+    @Test
+    public void dependencyLikeStructuresInProfileManagedPluginConfig()
+        throws Exception
+    {
+        final String depArtifactItemsPath =
+            "/project/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem|"
+                + "/project/profiles/profile/build//plugin[artifactId/text()=\"maven-dependency-plugin\"]//artifactItem";
+
+        final MavenPomView pomView = loadPoms( "pom-with-profile-pluginMgmt-deplike.xml" );
+
+        final List<DependencyView> dvs = pomView.getAllDependenciesMatching( depArtifactItemsPath );
+        assertThat( dvs, notNullValue() );
+        assertThat( dvs.size(), equalTo( 1 ) );
+
+        final DependencyView dv = dvs.get( 0 );
+
+        assertThat( dv.getGroupId(), equalTo( "org.foo" ) );
+        assertThat( dv.getArtifactId(), equalTo( "bar" ) );
+        assertThat( dv.getVersion(), equalTo( "1" ) );
+    }
+
+    @Test
     public void dependencyManagedBySingleBOM()
         throws Exception
     {

@@ -17,7 +17,7 @@
       <artifactId>galley-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.ximpleware</groupId>
+      <groupId>org.commonjava.vtd-xml</groupId>
       <artifactId>vtd-xml</artifactId>
     </dependency>
     <dependency>
