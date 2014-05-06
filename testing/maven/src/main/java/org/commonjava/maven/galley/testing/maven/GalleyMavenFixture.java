@@ -69,6 +69,7 @@ public class GalleyMavenFixture
     }
 
     public void initMissingComponents()
+        throws Exception
     {
         api.initMissingComponents();
 
